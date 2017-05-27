@@ -9,7 +9,8 @@ from utils import capitalize_only as cap
 from wiki_login import login
 from html_parser import export_json_model
 
-JSON_DIR = '../data/'
+URI_PATH = '../data/api_uri.txt'
+JSON_DIR = '../data/json/'
 ANDROID_DIR = 'android/'
 OUTPUT_DIR_PREFIX = '../output/' + ANDROID_DIR
 
@@ -77,7 +78,7 @@ def parse_model(json_model, prefix_indent=''):
                     cur_intent = prefix_indent + INDENT
                     inner_content = parse_model(json_model[key][0], cur_intent)
                     inner_java_model.append(assemble_inner_java(inner_content, type_value, cur_intent))
-            print('key: %s, value: %s ' % (key, value))
+            # print('key: %s, value: %s ' % (key, value))
     flat_inner_content = ''
     for value in inner_java_model:
         flat_inner_content += value
@@ -138,15 +139,18 @@ def show_help():
 
 if __name__ == '__main__':
     br = login()
-    response = br.open(WIKI_TEST_PAGE)
-    export_json_model(response.read())
-    # print(br.open(WIKI_TEST_PAGE).read())
-    response.close()
+    file_uri = open(URI_PATH, 'r')
+    uris = file_uri.read().split("\n") # create a list containing all lines
 
-    for parent, dirs, files in os.walk(JSON_DIR):
-        for single_file in files:
-            print("filename is:" + single_file)
-            output_file_name = cap(single_file.partition('.')[0])
-            generate_java(JSON_DIR + single_file, output_file_name)
-    # input_file = sys.argv[1]
-    # print("__file__=%s" % __file__)
+    for uri in uris:
+        try:
+            response = br.open(uri)
+            export_json_model(response.read())
+            response.close()
+            for parent, dirs, files in os.walk(JSON_DIR):
+                for single_file in files:
+                    print("filename is:" + single_file)
+                    output_file_name = cap(single_file.partition('.')[0])
+                    generate_java(JSON_DIR + single_file, output_file_name)
+        except:
+            print('exception: ' + uri)
