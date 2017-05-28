@@ -126,17 +126,6 @@ def check_import(type_import):
         imports_set.add(type_import)
 
 
-def check_args():
-    argv_count = len(sys.argv)
-    if argv_count < 2:
-        show_help()
-        exit()
-
-
-def show_help():
-    print('请输入JSON文件名')
-
-
 if __name__ == '__main__':
     br = login()
     file_uri = open(URI_PATH, 'r')
@@ -154,3 +143,4 @@ if __name__ == '__main__':
                     generate_java(JSON_DIR + single_file, output_file_name)
         except:
             print('exception: ' + uri)
+
